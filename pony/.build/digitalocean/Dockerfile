@@ -1,4 +1,4 @@
-FROM ponylang/ponyc:0.34.1
+FROM ponylang/ponyc:0.33.2
 
 RUN apt-get update
 RUN apt-get install -y clang libssl-dev
@@ -36,7 +36,5 @@ WORKDIR /opt/web
 {{#binaries}}
   COPY --from=0 /src/main/{{{.}}} {{{.}}}
 {{/binaries}}
-
-RUN apt-get -y update && apt-get -y install libssl1.1 libatomic1
 
 CMD ./main
