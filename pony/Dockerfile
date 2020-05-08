@@ -1,15 +1,16 @@
-FROM ponylang/ponyc:0.34.1
+FROM ponylang/ponyc:0.34.1-alpine
 
-RUN apt-get update
-RUN apt-get install -y clang libssl-dev
+RUN apk add clang openssl-dev
 
 WORKDIR /src/main
+
+COPY bundle.json .
+
+RUN stable fetch
 
 {{#sources}}
   COPY {{{.}}} {{{.}}}
 {{/sources}}
-
-RUN stable fetch
 
 {{#environment}}
   ENV {{{.}}}
@@ -19,24 +20,16 @@ RUN stable fetch
   RUN {{{.}}}
 {{/before_command}}
 
-RUN stable env ponyc -Dopenssl_1.1.x
+RUN stable env ponyc -Dopenssl_1.1.x -Dstatic
 
-FROM ubuntu
+FROM alpine 
+
+RUN apk add libatomic libgcc libexecinfo
 
 WORKDIR /opt/web
 
-{{#environment}}
-  ENV {{{.}}}
-{{/environment}}
-
-{{#files}}
-  COPY {{{.}}} {{{.}}}
-{{/files}}
-
 {{#binaries}}
-  COPY --from=0 /src/main/{{{.}}} {{{.}}}
+  COPY --from=0 /src/main/main {{{.}}}
 {{/binaries}}
 
-RUN apt-get -y update && apt-get -y install libssl1.1 libatomic1
-
-CMD ./main
+CMD ./web

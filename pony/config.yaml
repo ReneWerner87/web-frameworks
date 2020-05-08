@@ -3,20 +3,18 @@ provider:
     language: 0.34
     
 deps: 
-  - libssl1.1
-  - libatomic1
-  
-sources:
-  - "**/*.pony"
-  - bundle.json
+  - libatomic
 
 binaries:
-  - main
+  - web
+ 
+sources:
+  - "**/*.pony"
 
 cloud:
   config:
     package_update: true
-    package_upgrade: true
+    
     runcmd:
       # Disable cloud-init to avoid re-run on reboot
       - systemctl disable cloud-init
@@ -36,7 +34,7 @@ service: |
   Type=simple
   EnvironmentFile=/etc/web
   WorkingDirectory=/opt/web
-  ExecStart=/opt/web/main
+  ExecStart=/opt/web/web
 
   [Install]
   WantedBy=multi-user.target
